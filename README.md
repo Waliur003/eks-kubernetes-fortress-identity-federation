@@ -41,6 +41,8 @@ Standard Kubernetes implementations and default cloud cluster configurations fre
 * **Local Container Engine:** Docker Daemon Platform (CloudShell Asset Layering)
 
 ## Architecture Diagram
+<img width="1169" height="827" alt="Architecture Diagram" src="https://github.com/user-attachments/assets/e2a8b28c-6ea7-4865-a5d2-14f2557cf098" />
+
 
 ## Project Procedure
 
