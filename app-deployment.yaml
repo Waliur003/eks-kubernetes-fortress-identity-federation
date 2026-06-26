@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fortress-secure-app
+  namespace: production-apps
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: secure-s3-worker
+  template:
+    metadata:
+      labels:
+        app: secure-s3-worker
+    spec:
+      serviceAccountName: secure-pod-sa
+      containers:
+      - name: app-worker
+        image: 418272769771.dkr.ecr.us-east-1.amazonaws.com/devsecops-secure-app:latest
+        command: ["/bin/sh", "-c", "while true; do echo 'Fortress Secure App Running'; sleep 10; done"]
+        ports:
+        - containerPort: 8080
