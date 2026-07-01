@@ -149,6 +149,48 @@ EOF
 kubectl apply -f app-deployment.yaml
 ```
 
+## Infrastructure as Code (IaC) Architecture
+
+To preserve absolute repeatability and environment portability, the entire cluster layout is provisioned using version-locked Terraform configurations.
+
+### Directory Layout & Modular Structure
+
+```text
+eks-kubernetes-fortress-identity-federation/
+├── provider.tf          # Core initialization and global provider tag constraints
+├── variables.tf         # Abstracted input variable types and cluster sizing parameters
+├── vpc.tf               # Multi-AZ network fabric, isolated subnets, and NAT gateways
+├── iam.tf               # Identity controls, EKS master roles, and OIDC federated trust maps
+├── eks.tf               # Control plane orchestration and managed worker node pools
+└── outputs.tf           # Cluster endpoints, authority certificates, and configuration variables
+```
+
+### Detailed File-by-File Technical Breakdown
+
+#### System Provider Scoping (`provider.tf`)
+
+Restricts the compilation environment strictly to the standard AWS Provider v5.0+ module tree to leverage advanced IAM trust evaluation logic. It embeds a centralized default_tags definition block, ensuring that every private subnet, route table, managed instance, and security container automatically inherits corporate ownership parameters without manual tag duplication.
+
+#### Variable Abstractions (`variables.tf`)
+
+Parameterizes regional placement coordinates, isolated networking boundaries, cluster identification strings, and worker instance hardware capacities into strongly typed parameters. This keeps the execution plane entirely decoupled from hardcoded configuration attributes and allows the blueprint to move across staging environments seamlessly.
+
+#### Isolated Network Fabric (`vpc.tf`)
+
+Provisions the highly available virtual network layout split across two independent availability zones. It structures two public entry subnets and two completely isolated private subnets, initializing a public-facing NAT Gateway attached to a static Elastic IP to facilitate secure outbound internet egress for node configuration scripts while blocking all direct inbound exposure.
+
+#### Zero-Trust Access Control (`iam.tf`)
+
+Establishes separate, isolated machine roles for both the EKS management plane and the underlying compute fleet using strict Amazon managed permission sets. It dynamically constructs an OpenID Connect (OIDC) identity provider link and compiles a custom web identity trust framework, explicitly binding the target AWS role capability straight to the cluster service account execution path namespace.
+
+#### Kubernetes Orchestration Control (`eks.tf`)
+
+Provisions the central Kubernetes cluster master infrastructure with public and private endpoint access layers enabled. It simultaneously creates the managed compute node group, binding the instances exclusively to the private network subnet IDs and defining explicit horizontal auto-scaling group thresholds to handle sudden operational spikes seamlessly.
+
+#### Outputs & Discovery Endpoints (`outputs.tf`)
+
+Gathers and displays essential infrastructure metrics immediately upon successful environment execution. It strings together cluster endpoint API locations, secure certificate authorities, and private container registry tags to provide interactive configuration paths for immediate command-line tool connection.
+
 ## Technical Difficulties Faced & Engineering Resolutions
 
 ### Challenge 1: Asymmetric Routing Network Blackholes and Node Handshake Timeouts
